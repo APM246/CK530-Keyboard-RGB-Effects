@@ -1,5 +1,5 @@
 # Cooler-Master-CK530-LED-RGB-Effects
-Program that creates various RBG effects based on the state of the computer (e.g music volume)
+Program that creates various RBG effects on the Cooler Master CK530 keyboard based on the state of the computer (e.g music volume)
 
 ## Set Up
 Download the SDKDLL.dll file from Cooler Master's website.

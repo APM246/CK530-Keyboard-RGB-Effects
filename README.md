@@ -1,4 +1,4 @@
-# Cooler-Master-CK530-LED-RGB-Effects
+# CK530-Keyboard-RGB-Effects
 Program that creates various RBG effects on the Cooler Master CK530 keyboard based on the state of the computer (e.g music volume)
 
 ## Set Up

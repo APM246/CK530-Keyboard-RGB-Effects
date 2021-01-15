@@ -81,9 +81,10 @@ void musicEffects(DEVICE_INDEX kb)
 
         if (volume >= 2.5*average)
         {
-            int row = rand() % NUM_ROWS; int col = rand() % NUM_COLS;
-            radiateOutwards(row, col, r, g, b , 2, kb);
-            Sleep(200);
+            int col = rand() % NUM_COLS;
+            lightColumn(col, kb, r, g, b);
+            lightColumn(NUM_COLS - col - 1, kb, r, g, b);
+            Sleep(170);
         }
 
         else if (volume >= 1.9*average)
@@ -94,10 +95,9 @@ void musicEffects(DEVICE_INDEX kb)
 
         else if (volume >= 1.1*average)
         {
-            int col = rand() % NUM_COLS;
-            lightColumn(col, kb, r, g, b);
-            lightColumn(NUM_COLS - col - 1, kb, r, g, b);
-            Sleep(100);
+            int row = rand() % NUM_ROWS; int col = rand() % NUM_COLS;
+            radiateOutwards(row, col, r, g, b , 2, kb);
+            Sleep(200);
         }
 
         SetFullLedColor(0, 0, 0, kb);

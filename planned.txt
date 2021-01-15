@@ -1,0 +1,1 @@
+reset average volume if volume drops back to 0? (new song started?)

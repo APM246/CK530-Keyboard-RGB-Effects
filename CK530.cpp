@@ -8,59 +8,13 @@
 #include <vector>
 #include <string>
 #include <time.h>
+#include <cmath>
 
 using namespace std;
 
-void displayFPS(DEVICE_INDEX kb) 
-{
-    ifstream file("HardwareMonitoring.hml", ios::in);
-    Sleep(7000);
-    /*file.seekg(70, ios::end);
-    //char c;
-    //file.get(c);
-    std::getline(file, line);
-
-    char temp[400];
-    while (!file.eof()) {
-        file.getline(temp, 400);
-    }
-
-    cout << temp << endl;*/
-
-    if (file.is_open())
-    {
-        string temp;
-        // skip past pointless lines 
-        for (int i = 0; i < 4; i++) std::getline(file, temp);
-
-        while (true) {
-            std::getline(file, temp);
-            std::stringstream ss(temp);
-            std::vector<string> result;
-
-            while( ss.good() )
-            {
-                string substr;
-                getline( ss, substr, ',');
-                result.push_back( substr );
-            }
-
-            int fps = stoi(result[result.size() - 1]);
-            int tens = fps%10;
-            int ones = fps - 10*tens;
-            for (int i = 0; i < 9000; i++) {
-                SetLedColor(1, tens, 0, 255, 0, kb);
-                SetLedColor(1, ones, 0, 255, 0, kb);
-            }
-
-        }
-    }
-  
-    else cout << "file could not be opened" << endl;    
-
-    file.close();
-}
-
+/**
+ * lights a specified column of switches with a specified colour 
+*/
 void lightColumn(int col, DEVICE_INDEX kb, int r, int g, int b)
 {
     int NUM_ROWS = 6;
@@ -71,30 +25,79 @@ void lightColumn(int col, DEVICE_INDEX kb, int r, int g, int b)
     }
 }
 
+/**
+ * row and col are coordinates of centre of outwards radiating effect. 
+ * 
+*/
+void radiateOutwards(int row, int col, int r, int g, int b, DEVICE_INDEX kb)
+{
+    int num_keys_lighted;
+    int radius = 0;
+
+    do
+    {
+        num_keys_lighted = 0;
+        radius++;
+        
+        for (int i = -radius; i < radius + 1; i++)
+        {
+            for (int j = -radius; j < radius + 1; j++)
+            {
+                if (i == 0 && j == 0) continue;
+                
+                float distance = pow(i*i + j*j, 0.5);
+
+                if (distance > radius - 1  && SetLedColor(row + i, col + j, r, g, b, kb)) num_keys_lighted++;
+            }
+        }
+
+        SetFullLedColor(0, 0, 0, kb);
+    }
+    
+    while (num_keys_lighted > 0);
+
+}
+
+
 void musicEffects(DEVICE_INDEX kb)
 {
+    int num_vals = 0;
+    float total_val = 0;
+    float average = 0;
     int NUM_COLS = 18;
+    int NUM_ROWS = 6;
     int MAX_RGB = 255;
     srand(time(0));
 
     while (true)
     {
         float volume = GetNowVolumePeekValue();
+        if (volume == 0) continue;
+        num_vals++;
+        total_val += volume;
+        average = total_val/num_vals;
+        //cout << volume << ", " << average << endl;
 
-        if (volume >= 0.48)
+        int r = rand() % MAX_RGB; int g = rand() % MAX_RGB; int b = rand() % MAX_RGB;
+
+        if (volume >= 2.5*average)
         {
-            int r = rand() % MAX_RGB; int g = rand() % MAX_RGB; int b = rand() % MAX_RGB;
-            SetFullLedColor(r, g, b, kb);
-            Sleep(200);
+            int row = rand() % NUM_ROWS; int col = rand() % NUM_COLS;
+            radiateOutwards(row, col, r, g, b ,kb);
         }
 
-        else if (volume > 0.38)
+        else if (volume >= 1.9*average)
+        {
+            SetFullLedColor(r, g, b, kb);
+            Sleep(150);
+        }
+
+        else if (volume >= 1.1*average)
         {
             int col = rand() % NUM_COLS;
-            int r = rand() % MAX_RGB; int g = rand() % MAX_RGB; int b = rand() % MAX_RGB;
             lightColumn(col, kb, r, g, b);
             lightColumn(NUM_COLS - col - 1, kb, r, g, b);
-            Sleep(200);
+            Sleep(100);
         }
 
         SetFullLedColor(0, 0, 0, kb);
@@ -112,7 +115,10 @@ void displayVolume()
 int main()
 {
     //displayVolume();
+    //radiateOutwards(3, 6, 25, 56, 190, DEV_CK530);
     musicEffects(DEV_CK530);
+
+
 
     return 0;
 }

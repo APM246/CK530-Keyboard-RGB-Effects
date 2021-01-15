@@ -29,7 +29,7 @@ void lightColumn(int col, DEVICE_INDEX kb, int r, int g, int b)
  * row and col are coordinates of centre of outwards radiating effect. 
  * 
 */
-void radiateOutwards(int row, int col, int r, int g, int b, DEVICE_INDEX kb)
+void radiateOutwards(int row, int col, int r, int g, int b, int max_radius, DEVICE_INDEX kb)
 {
     int num_keys_lighted;
     int radius = 0;
@@ -54,7 +54,7 @@ void radiateOutwards(int row, int col, int r, int g, int b, DEVICE_INDEX kb)
         SetFullLedColor(0, 0, 0, kb);
     }
     
-    while (num_keys_lighted > 0);
+    while (num_keys_lighted > 0 && radius < max_radius);
 
 }
 
@@ -72,7 +72,6 @@ void musicEffects(DEVICE_INDEX kb)
     while (true)
     {
         float volume = GetNowVolumePeekValue();
-        if (volume == 0) continue;
         num_vals++;
         total_val += volume;
         average = total_val/num_vals;
@@ -83,7 +82,8 @@ void musicEffects(DEVICE_INDEX kb)
         if (volume >= 2.5*average)
         {
             int row = rand() % NUM_ROWS; int col = rand() % NUM_COLS;
-            radiateOutwards(row, col, r, g, b ,kb);
+            radiateOutwards(row, col, r, g, b , 2, kb);
+            Sleep(200);
         }
 
         else if (volume >= 1.9*average)
@@ -116,6 +116,7 @@ int main()
 {
     //displayVolume();
     //radiateOutwards(3, 6, 25, 56, 190, DEV_CK530);
+    while (GetNowVolumePeekValue() == 0) {}
     musicEffects(DEV_CK530);
 
 

@@ -1,1 +1,3 @@
 reset average volume if volume drops back to 0? (new song started?)
+
+dont start function until volume level > 0 (bring outside of musicEffects() so quiet part of song still counted in average)
